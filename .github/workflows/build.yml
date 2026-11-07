@@ -1,0 +1,13 @@
+name: build-only
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build action image (same as the docker action would)
+        run: docker build --progress=plain -t mlv ./action
+      - name: Smoke-test tools in image
+        run: |
+          docker run --rm --entrypoint bash mlv -c 'ls -la /root/.local/bin; /root/.local/bin/agda --version; python3.10 -c "import networkx, numpy, pandas; print(\"py ok\")"'
