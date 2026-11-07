@@ -1,0 +1,32 @@
+name: debug-visualize
+on: workflow_dispatch
+jobs:
+  visualize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: Unimath/agda-unimath
+          ref: master
+          path: mylib
+      - uses: actions/checkout@v4
+        with:
+          repository: JobPetrovcic/agda-proof-assistent-assistent
+          token: ${{ secrets.ACCESS }}
+          ref: master
+          path: agda-proof-assistent-assistent
+      - uses: ./action
+        with:
+          language: agda
+          file_type: src/everything.lagda.md
+          mode: standalone
+          install_libs: no
+          additional_commands: "make src/everything.lagda.md"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: output
+          path: output
+          if-no-files-found: warn
