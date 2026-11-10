@@ -26,6 +26,7 @@ RUN apt-get update -q \
 	&& mkdir -p ~/.agda \
 	&& cd ~/.agda \
 	&& git clone --depth 1 -b sexp-updated https://github.com/JobPetrovcic/agda src \
+	&& sed -i '/DuplicateInterfaceFiles selected ignored/,/^$/d' src/src/full/Agda/TypeChecking/Pretty/Warning.hs \
 	&& stack --stack-yaml src/stack-"${ghc_version}".yaml install \
 	&& stack --stack-yaml src/stack-"${ghc_version}".yaml clean \
 	&& sudo chmod +x /entrypoint.sh
