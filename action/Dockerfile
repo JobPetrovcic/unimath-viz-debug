@@ -28,6 +28,7 @@ RUN apt-get update -q \
 	&& git clone --depth 1 -b sexp-updated https://github.com/JobPetrovcic/agda src \
 	&& sed -i '/DuplicateInterfaceFiles selected ignored/,/^$/d' src/src/full/Agda/TypeChecking/Pretty/Warning.hs \
 	&& sed -i -e 's/^import Agda.TypeChecking.Monad as TCM$/import Agda.TypeChecking.Monad as TCM hiding (SourceFile(..))/' -e 's/toSexp (TCM.GeneralizableVar) =/toSexp (TCM.GeneralizableVar {}) =/' -e 's/toSexp (TopLevelModuleName _ _ ps) =/toSexp (TopLevelModuleName _ _ ps _) =/' src/src/full/Agda/Interaction/Highlighting/Sexp/Base.hs \
+	&& sed -i 's/^  , mayEraseType          = const \$ return False$/&\n  , backendInteractTop    = Nothing\n  , backendInteractHole   = Nothing/' src/src/full/Agda/Interaction/Highlighting/Sexp/Backend.hs \
 	&& stack --stack-yaml src/stack-"${ghc_version}".yaml install \
 	&& stack --stack-yaml src/stack-"${ghc_version}".yaml clean \
 	&& sudo chmod +x /entrypoint.sh
