@@ -5,6 +5,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
+      - name: Add swap space
+        run: |
+          df -h / /mnt || true
+          free -h
+          sudo swapoff -a || true
+          sudo rm -f /mnt/swapfile
+          sudo fallocate -l 40G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+          free -h
+          (while true; do echo "MEM $(date -u +%H:%M:%S) $(free -m | awk '/Mem/{print "used="$3} /Swap/{print "swap="$3}' | tr '\n' ' ')" >> /tmp/mem.log; sleep 30; done) &
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
@@ -24,6 +36,9 @@ jobs:
           mode: standalone
           install_libs: no
           additional_commands: "make src/everything.lagda.md"
+      - name: Memory log
+        if: always()
+        run: cat /tmp/mem.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
