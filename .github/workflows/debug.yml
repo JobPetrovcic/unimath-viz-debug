@@ -3,7 +3,7 @@ on: workflow_dispatch
 jobs:
   visualize:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 360
     steps:
       - name: Add swap space
         run: |
@@ -29,6 +29,12 @@ jobs:
           token: ${{ secrets.ACCESS }}
           ref: master
           path: agda-proof-assistent-assistent
+      - name: Patch main.py (test only, runner copy)
+        run: |
+          cd agda-proof-assistent-assistent
+          sed -i 's/^        entries = create_from_files(sexp_dir, lib_source_dir)$/&\n        gc.freeze()  # keep GC from scanning (swapped-out) ASTs/' main.py
+          sed -i 's/^import os$/import gc\nimport os/' main.py
+          git diff
       - uses: ./action
         with:
           language: agda
